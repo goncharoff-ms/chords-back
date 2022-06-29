@@ -1,0 +1,52 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+   http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="chords-1" author="goncharov">
+        <createTable tableName="task">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+
+            <column name="type" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="link" type="varchar"/>
+
+            <column name="create_at" type="timestamp" defaultValueComputed="now()"/>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="chords-2" author="goncharov">
+        <addColumn tableName="task">
+            <column name="is_completed" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="task">
+            <column name="completed_at" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="chords-3" author="goncharov">
+        <addColumn tableName="task">
+            <column name="song_name" type="varchar"/>
+            <column name="song_rate" type="bigint"/>
+            <column name="site" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+
+
+</databaseChangeLog>
