@@ -4,7 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "song")
@@ -13,12 +13,13 @@ import java.time.Instant;
 @Getter
 @Setter
 @ToString
+@Builder
 public class Song {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Lob
     @Column(name = "name")
     private String name;
 
@@ -26,50 +27,17 @@ public class Song {
     private Long rate;
 
     @Column(name = "text", nullable = false)
-    @Type(type = "org.hibernate.type.TextType")
     private String text;
 
     @Column(name = "create_at")
-    private Instant createAt;
+    private LocalDateTime createAt;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "author_many_name")
+    private String authorManyName;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getRate() {
-        return rate;
-    }
-
-    public void setRate(Long rate) {
-        this.rate = rate;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Instant getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(Instant createAt) {
-        this.createAt = createAt;
-    }
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "author_id", nullable = false)
+    @ToString.Exclude
+    private Author author;
 
 }

@@ -11,13 +11,14 @@ import javax.persistence.*;
 @Getter
 @Setter
 @ToString
+@Builder
 public class Author {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Lob
     @Column(name = "name")
     private String name;
 

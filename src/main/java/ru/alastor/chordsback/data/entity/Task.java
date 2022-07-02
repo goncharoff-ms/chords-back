@@ -34,9 +34,9 @@ public class Task {
     private LocalDateTime createAt;
 
     @Column(name = "is_completed", nullable = false, columnDefinition = "boolean default false")
-    private boolean isCompleted;
+    private boolean completed;
 
-    @Column(name = "completed_at", nullable = false, columnDefinition = "now()")
+    @Column(name = "completed_at", nullable = false)
     private LocalDateTime completedAt;
 
     @Enumerated(EnumType.STRING)

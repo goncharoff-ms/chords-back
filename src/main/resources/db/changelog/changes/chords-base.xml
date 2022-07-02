@@ -70,5 +70,32 @@
 
     </changeSet>
 
+    <changeSet id="chords-5" author="goncharov">
+        <addColumn tableName="song">
+            <column name="author_many_name" type="varchar"/>
+        </addColumn>
+
+        <addColumn tableName="song">
+            <column name="author_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="song" baseColumnNames="author_id"
+                                 constraintName="fk_song_author_id_to_author"
+                                 referencedTableName="author" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="chords-6" author="goncharov">
+        <createTable tableName="mychords_name_mapper">
+            <column name="real_name" type="varchar">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="site_name" type="varchar">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 
 </databaseChangeLog>

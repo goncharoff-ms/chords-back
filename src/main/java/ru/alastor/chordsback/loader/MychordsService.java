@@ -55,10 +55,9 @@ public class MychordsService {
                 .referrer("https://www.google.com")
                 .get();
 
-        SongMychords song = parser.getSong(doc);
+        log.info("Load song {}", linkSong);
 
-
-        return null;
+        return parser.getSong(doc);
     }
 
 
