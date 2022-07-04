@@ -5,7 +5,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
+import ru.alastor.chordsback.loader.dto.AuthorMychord;
 import ru.alastor.chordsback.loader.dto.SongLight;
 import ru.alastor.chordsback.loader.dto.SongMychords;
 
@@ -20,6 +22,7 @@ public class MychordsParser {
         return doc.select(".b-pagination > li")
                 .stream()
                 .filter(e -> !e.hasClass("next"))
+                .filter(e -> !e.text().contains(".."))
                 .map(e -> Integer.parseInt(e.text()))
                 .max(Integer::compareTo)
                 .orElseThrow();
@@ -42,7 +45,11 @@ public class MychordsParser {
                 "> span.b-viewed > span.b-viewed__count").text());
         final String title = doc.select(".b-title--song").text();
 
-        final String[] authorAndTitle = title.split("-");
+        String[] authorAndTitle = title.split("-");
+        if (authorAndTitle.length <= 1) {
+            authorAndTitle = title.split("—");
+        }
+
         final String authorNameFull = authorAndTitle[0];
         final String songName = authorAndTitle[1];
         final String author = doc.select(".b-breadcrumbs > span:nth-last-child(1) > a > span").text();
@@ -62,6 +69,11 @@ public class MychordsParser {
                     continue;
                 }
 
+                if (textElement.hasClass("b-words__tab-row")) {
+                    textBuilder.append(textElement.wholeText());
+                    continue;
+                }
+
                 try {
                     final String chord = textElement.select(".b-accord__symbol > a")
                             .attr("data-title")
@@ -70,7 +82,7 @@ public class MychordsParser {
 
                     textBuilder.append("{{").append(chord).append("}}");
                 } catch (Exception e) {
-                    log.error("parse error");
+                    log.error("parse error", e);
                 }
             }
         }
@@ -82,6 +94,34 @@ public class MychordsParser {
                 .author(author)
                 .authorFull(authorNameFull)
                 .build();
+    }
+
+
+    public List<AuthorMychord> getAuthors(Document doc) {
+        final Elements allTd = doc.select(".b-listing-singers__item");
+
+        final List<Element> authorsTd = allTd.subList(1, allTd.size());
+
+        return authorsTd.stream()
+                .map(e -> {
+                    final Elements authorElement =
+                            e.select(".b-listing-singers__item__name_m");
+
+                    final String linkAuthor = authorElement.select("a")
+                            .attr("href")
+                            .replaceAll("/", "")
+                            .replaceAll("ru", "");
+
+                    long rate = Long.parseLong(e.select(".b-listing-singers__item__number")
+                            .last().text());
+
+                    return AuthorMychord.builder()
+                            .siteName(linkAuthor)
+                            .realName(authorElement.text())
+                            .rate(rate)
+                            .build();
+                })
+                .toList();
     }
 
     private final static List<String> stopWords = List.of(

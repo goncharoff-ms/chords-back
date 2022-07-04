@@ -97,5 +97,31 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="chords-7" author="goncharov">
+        <dropUniqueConstraint tableName="task" constraintName="task_link_key"/>
+
+        <addColumn tableName="mychords_name_mapper">
+            <column name="rate" type="bigint"/>
+        </addColumn>
+
+    </changeSet>
+
+    <changeSet id="chords-8" author="goncharov">
+        <addColumn tableName="mychords_name_mapper">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="chords-9" author="goncharov">
+        <dropUniqueConstraint tableName="mychords_name_mapper" constraintName="mychords_name_mapper_real_name_key"/>
+        <dropUniqueConstraint tableName="mychords_name_mapper" constraintName="mychords_name_mapper_site_name_key"/>
+    </changeSet>
+
+    <changeSet id="chords-10" author="goncharov">
+        <addUniqueConstraint tableName="mychords_name_mapper" columnNames="real_name,site_name"/>
+    </changeSet>
+
 
 </databaseChangeLog>

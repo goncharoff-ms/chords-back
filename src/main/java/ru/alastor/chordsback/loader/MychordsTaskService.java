@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.alastor.chordsback.data.entity.Author;
+import ru.alastor.chordsback.data.entity.MychordsNameMapper;
 import ru.alastor.chordsback.data.entity.Song;
 import ru.alastor.chordsback.data.entity.Task;
 import ru.alastor.chordsback.data.repository.AuthorRepository;
+import ru.alastor.chordsback.data.repository.MychordsNameMapperRepository;
 import ru.alastor.chordsback.data.repository.SongRepository;
 import ru.alastor.chordsback.data.repository.TaskRepository;
+import ru.alastor.chordsback.loader.dto.AuthorMychord;
 import ru.alastor.chordsback.loader.dto.SongMychords;
 import ru.alastor.chordsback.loader.parsing.ParsingSiteType;
 import ru.alastor.chordsback.loader.parsing.TaskType;
@@ -17,6 +20,8 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -27,6 +32,7 @@ public class MychordsTaskService {
     private final TaskRepository taskRepository;
     private final SongRepository songRepository;
     private final AuthorRepository authorRepository;
+    private final MychordsNameMapperRepository mychordsNameMapperRepository;
 
     public Optional<Task> findRandomNotCompletedTaskByType(TaskType type) {
         return taskRepository.findFirstByTypeAndSiteAndCompleted(type, ParsingSiteType.MYCHORDS, false);
@@ -106,7 +112,47 @@ public class MychordsTaskService {
         final Optional<Task> taskOpt = findRandomNotCompletedTaskByType(TaskType.UPDATE_MAPPING_MYCHORD_NAMES);
 
         taskOpt.ifPresentOrElse(t -> {
+                    log.info("Началась задача загрузки маппингов имен mychords (taskOpt={})", t);
 
+                    try {
+                        final List<CompletableFuture<List<AuthorMychord>>> mappingNameRussianAuthorStream =
+                                mychordsService.getMappingNameRussianAuthorStream();
+
+                        for (CompletableFuture<List<AuthorMychord>> authorsFuture : mappingNameRussianAuthorStream) {
+                            authorsFuture.thenAccept(al -> {
+                                final List<MychordsNameMapper> mychordsNameMappers = al.stream()
+                                        .map(a -> MychordsNameMapper.builder()
+                                                .realName(a.getRealName())
+                                                .siteName(a.getSiteName())
+                                                .rate(a.getRate())
+                                                .build())
+                                        .toList();
+
+                                mychordsNameMapperRepository.saveAll(mychordsNameMappers);
+                            });
+                        }
+
+
+                        for (CompletableFuture<List<AuthorMychord>> listCompletableFuture : mappingNameRussianAuthorStream) {
+                            listCompletableFuture.get();
+                        }
+
+                        t.setCompleted(true);
+                        t.setCompletedAt(LocalDateTime.now());
+                        taskRepository.save(t);
+
+
+                        taskRepository.save(Task.builder()
+                                .site(ParsingSiteType.MYCHORDS)
+                                .type(TaskType.UPDATE_MAPPING_MYCHORD_NAMES)
+                                .link("")
+                                .createAt(LocalDateTime.now())
+                                .completed(false)
+                                .build());
+                    } catch (Exception e) {
+                        log.error("Ошибка при загрузке памингов авторов mychords");
+                        e.printStackTrace();
+                    }
 
                 },
                 () -> log.info("Нету задач по обновлению маппингу имен"));
