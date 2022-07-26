@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import ru.alastor.chordsback.data.entity.Song;
 import ru.alastor.chordsback.data.repository.SongRepository;
 import ru.alastor.chordsback.loader.MychordsTaskService;

@@ -14,11 +14,13 @@ import ru.alastor.chordsback.data.entity.Song;
 public class SongPreviewDto {
     private Long id;
     private String name;
+    private String authorManyName;
 
     public static SongPreviewDto fromEntity(Song song) {
         return SongPreviewDto.builder()
                 .id(song.getId())
                 .name(song.getName())
+                .authorManyName(song.getAuthorManyName())
                 .build();
     }
 }

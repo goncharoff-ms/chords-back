@@ -10,6 +10,6 @@ import ru.alastor.chordsback.data.entity.Song;
 public interface SongRepository extends JpaRepository<Song, Long> {
     Page<Song> searchByAuthorId(Pageable pageable, Long authorId);
 
-    Page<Song> searchByNameLikeIgnoreCaseOrAuthorManyNameLikeIgnoreCase(String name, String authorManyName,
-                                                                        Pageable pageable);
+    Page<Song> searchAllByNameContainingIgnoreCaseOrAuthorManyNameContainingIgnoreCase(String name, String authorManyName, Pageable pageable);
+
 }

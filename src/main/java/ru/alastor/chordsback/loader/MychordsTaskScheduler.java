@@ -25,9 +25,9 @@ public class MychordsTaskScheduler {
         taskService.resolveSongTask();
     }
 
-    @Scheduled(fixedRate = 12, timeUnit = TimeUnit.HOURS)
-    public void taskMappingNamesMychords() {
-        taskService.resolveMappingMychordsNames();
-    }
+//    @Scheduled(fixedRate = 12, timeUnit = TimeUnit.HOURS)
+//    public void taskMappingNamesMychords() {
+//        taskService.resolveMappingMychordsNames();
+//    }
 
 }

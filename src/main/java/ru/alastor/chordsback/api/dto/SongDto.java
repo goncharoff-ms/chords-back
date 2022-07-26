@@ -22,6 +22,7 @@ public class SongDto {
     public static SongDto fromEntity(Song song) {
         return SongDto.builder()
                 .id(song.getId())
+                .name(song.getName())
                 .authorName(song.getAuthor().getName())
                 .authorManyName(song.getAuthorManyName())
                 .rate(song.getRate())
